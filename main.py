@@ -1,73 +1,72 @@
 import pandas as pd
 import numpy as np
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn import metrics
 import matplotlib.pyplot as plt
-
+from matplotlib import style
 
 df = pd.read_csv('Bitcoin.csv')
-df.shape
+df.head(5)
 
-# BTC Close price graphic
+# x and y dataframes values
+x= df[['High','Open','Low','Volume']].values
+y= df['Close'].values
 
-plt.figure(figsize=(15,5))
+# x and y train and test
+x_train,x_test,y_train,y_test = train_test_split(x,y,test_size=0.2,random_state=0)
+
+# Linear regression
+regressor = LinearRegression()
+regressor.fit(x_train,y_train)
+
+y_pred=regressor.predict(x_test)
+result = pd.DataFrame({'Actual':y_test.flatten(),'Predicted':y_pred.flatten()})
+
+# Close price graph
+plt.figure(figsize=(10,5))
 plt.title('BTC Close Price')
 plt.xlabel('Days')
-plt.ylabel('Close price in USD')
+plt.ylabel('Close price USD')
 plt.plot(df['Close'])
 plt.show()
 
-# Close dataframe
-df = df[['Close']]
+# Close price df
+df =df[['Close']]
 
-# Days prediction
-prediction_days = 30
+# X days prediction variable,minus pred_days
+pred_days = 30
+df['Prediction']=df[['Close']].shift(-pred_days)
 
-# Create a new column(Prediction), - prediction_days
-df['Prediction'] = df['Close'].shift(-prediction_days)
-df.tail(2)
+# Convert to numpy array, removing the last x rows/days
+X=np.array(df.drop(['Prediction'],1))[:-pred_days]
+y = np.array(df['Prediction'])[:-pred_days]
 
-#Create X and Y array
-X = np.array(df.drop(['Prediction'],1))[:-prediction_days]
-print(X)
-y = np.array(df['Prediction'])[:-prediction_days]
-
-# Training and testing
+# 75% training and 25% testing
 x_train,x_test,y_train,y_test = train_test_split(X,y,test_size=0.25)
 
-#Linear Regression
-tree = DecisionTreeRegressor().fit(x_train,y_train)
-lr = LinearRegression().fit(x_train,y_train)
-
-x_future = df.drop(['Prediction'],1)[:-prediction_days]
-x_future = x_future.tail(prediction_days)
-x_future = np.array(x_future)
+# Get the last x row or the future data set
+x_future =df.drop(['Prediction'],1)[:-pred_days]
+x_future=x_future.tail(pred_days)
+x_future=np.array(x_future)
 x_future
 
-# Model tree prediction
+# Models lr prediction
+lr = LinearRegression().fit(x_train,y_train)
+lr_prediction = lr.predict(x_future)
+print(lr_prediction)
 
-tree_pred = tree.predict(x_future)
-print(tree_pred)
-print()
+# Data visual
 
-# Linear regression prediction
+predictions = lr_prediction
 
-lr_pred = lr.predict(x_future)
-print(lr_pred)
-
-# Prediction graphic
-
-predictions = tree_pred
-
-valid = df[X.shape[0]:]
-valid['Predictions'] = predictions
-plt.figure(figsize=(16,8))
+valid=df[X.shape[0]:]
+valid['Prediction']=predictions
+plt.figure(figsize=(15,5))
 plt.title('Model')
 plt.xlabel('Days')
 plt.ylabel('Close price USD')
 plt.plot(df['Close'])
 plt.plot(valid[['Close','Prediction']])
-plt.show
-
-
+plt.legend(['Orig','Pred']),
+plt.show()
