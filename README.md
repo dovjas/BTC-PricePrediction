@@ -12,6 +12,7 @@ Data Preparation
 2.5 Drop Subsets Of Data Where Might Cause Bias;
 
  Predicting BTC price.
+ 
 3.1 x and y train and test;
 
 3.2 Linear regression;
