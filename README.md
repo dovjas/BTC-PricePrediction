@@ -1,4 +1,5 @@
 <h1>This project focuses on predicting the close price of BTC.</h1>
+The project consists of machine-learning models trained on the Bitcoin's historical pricing. 
 
 1. Import Packages
 2. Data Preparation
