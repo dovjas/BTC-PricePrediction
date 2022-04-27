@@ -10,6 +10,6 @@ Data Preparation
 
 <h2> Predicting BTC price </h2>
  
-3.1 x and y train and test;
-3.2 Linear regression;
-3.3 75% training and 25% testing;
+- 3.1 x and y train and test;
+- 3.2 Linear regression;
+- 3.3 75% training and 25% testing;
